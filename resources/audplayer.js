@@ -1,48 +1,77 @@
+//run init fxn on load
+document.onload = initplaylists();
 
-var aud = {
-  // init playe
-  player : null,   // html <audio> element
-  playlist : null, // html playlist
-  now : 0,         // current song
-  
+//init the players
+function initplaylists() {
+  //get all the players
+  var players = document.getElementsByClassName("player");
+  var audios = [];
 
-  init : () => {
-    // get html elements for the player, song list, and audio directory
-    aud.player = document.getElementById("playerAudio");
-    aud.playlist = document.querySelectorAll("#playerList .song");
-    //make sure that there is a trailing "/" and that ampersands are encoded properly
-    auddir = document.getElementById("auddir").innerHTML.replace("&amp;","&")+"/";
+  //for each player, set up its environment
+  for(var p=0;p<players.length;p++) {
+    //the player environment
+    let aud = {
+      //everything is relative to the player wrapper
+      player: players[p],
+      audio: null,
+      playlist: null,
+      now: 0,
+      shuffle: true,
+      loop: true,
 
-    // apply event handlers (click/enter to play)
-    for (let i=0; i<aud.playlist.length; i++) {
-      aud.playlist[i].onclick = () => { aud.play(i); };
-      aud.playlist[i].onkeypress = (e) => { if(e.keyCode == 13) {aud.play(i);} };
-    }
+      init : () => {
+        //get the audio features (player, playlist, and directory
+        aud.audio = aud.player.querySelectorAll(".playerAudio")[0];
+        aud.playlist = aud.player.querySelectorAll(".playerList .song");
+        auddir = aud.player.querySelectorAll(".auddir")[0].innerHTML.replace("&amp;","&")+"/";
+        //assign event handlers to the playlist elements
+        for(let i=0;i<aud.playlist.length;i++) {
+          aud.playlist[i].onclick = () => { aud.play(i); };
+          aud.playlist[i].onkeypress = (e) => { if(e.keyCode == 13) {aud.play(i);} };
+        }
+        //autoplay
+        aud.audio.oncanplay = aud.audio.play;
 
-    // auto-play when loaded
-    aud.player.oncanplay = aud.player.play;
+        //at the end of each song, check if shuffle and loop are enabled
+        aud.audio.onended = () => {
+          aud.shuffle = aud.player.querySelectorAll(".shuff")[0].checked;
+          aud.loop = aud.player.querySelectorAll(".loop")[0].checked;
 
-    // autoplay when current song ends (increment/loop, then play)
-    aud.player.onended = () => {
-      aud.now++;
-      if (aud.now>=aud.playlist.length) { aud.now = 0; }
-      aud.play(aud.now);
+          if(aud.shuffle) {
+            aud.now = Math.floor(Math.random() * aud.playlist.length);
+          } else {
+            aud.now++;
+          }
+          
+          if(aud.loop) {
+            if(aud.now>=aud.playlist.length) {
+              aud.now = 0;
+            }
+          }
+          //play the song
+          aud.play(aud.now);
+        };
+      },
+
+      //play the song
+      play : id => {
+        //get the one now playing
+        aud.now = id;
+
+        aud.player.getElementsByClassName("nowplaying")[0].innerHTML = aud.playlist[id].innerHTML;
+        //set the audio source as the one now playing
+        aud.audio.src = auddir + aud.playlist[id].dataset.src;
+        //assign the playlist element now-playing classes
+        for(let i=0; i<aud.playlist.length;i++) {
+          if(i==id) { aud.playlist[i].classList.add("now"); }
+          else { aud.playlist[i].classList.remove("now"); }
+        }
+      }
     };
-  },
-
-
-  //play selected song
-  play : id => {
-    // update source
-    aud.now = id;
-    aud.player.src = auddir + aud.playlist[id].dataset.src;
-    //document.getElementById("title").innerHTML = aud.playlist[id].getElementsByClassName("title")[0].innerHTML;
-    
-    //identify which song is currently playing (for css)
-    for (let i=0; i<aud.playlist.length; i++) {
-      if (i==id) { aud.playlist[i].classList.add("now"); }
-      else { aud.playlist[i].classList.remove("now"); }
-    }
+    //add the new player to the list of them
+    audios.push(aud);
   }
-};
-window.addEventListener("DOMContentLoaded", aud.init);
+  //init the players
+  for(var i=0;i<audios.length;i++) { audios[i].init(); }
+}
+

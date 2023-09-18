@@ -1,46 +1,54 @@
 
-#player {
+.player {
   width: 450px;
   text-align: center;
 }
 
-#player #folderpic {
+.player .folderpic {
   max-width: 50%;
   max-height: 30vh;
   border: solid black 1px;
   border-radius: 10px;
 }
 
-#playerAudio { width: 100%; }
-#playerList { 
+.player .plcontrol {
+  border: solid black 1px;
+}
+
+.shuff {
+  font-size: large;
+}
+
+.playerAudio { width: 100%; }
+.playerList { 
   margin-top: 10px;
   text-align: left;
   max-height: 50vh;
   overflow-y: scroll;
 }
-#playerList .song {
+.playerList .song {
   padding: 10px;
   color: #333;
   border-bottom: 1px solid #e1e1e1;
   cursor: pointer;
 }
-#playerList .song:first-child {
+.playerList .song:first-child {
   border-top: 1px solid #e1e1e1;
 }
-#playerList .song.now {
+.playerList .song.now {
   font-weight: bold;
   color: #000;
   background: #feffd9;
 }
-#playerList .song::before {
+.playerList .song::before {
   content: "";
   margin-right: 10px;
 }
-#playerList .song.now::before {
+.playerList .song.now::before {
   content: "\27A4";
 }
 
-#playerList .song:hover, #playerList .song:focus {
+.playerList .song:hover, .playerList .song:focus {
   color: #000;
   font-weight: bold;
 }

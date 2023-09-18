@@ -1,5 +1,5 @@
 <?php
-$exclude = ["./resources","./index.php"]; //exclude these files/directories from being displayed - path must be relative to this file
+$exclude = ["./resources","./index.php","./LICENSE","./README"]; //exclude these files/directories from being displayed - path must be relative to this file
 
 //if the directory var is set,
 if(isset($_GET['d'])) {
@@ -9,6 +9,7 @@ if(isset($_GET['d'])) {
   $curDir = "."; //else, set it to the top level directory
 }
 $curDir = str_replace(["../",".."],"",$curDir)|"."; //remove higher directory listing - for security
+//echo $curDir; //SHOW ME WHAT YOU GOT
 
 $oneUp = implode("/",array_splice(explode("/",$curDir),0,-1)); //convert path var to array, remove last element, convert back to path
 ?>
@@ -16,11 +17,11 @@ $oneUp = implode("/",array_splice(explode("/",$curDir),0,-1)); //convert path va
 <!DOCTYPE html>
 <html>
   <head>
-    <title><?php echo end(explode('/',$curDir)); ?> | Steve's Media Library</title>
+    <title><?php echo end(explode('/',$curDir)); ?> | Media Library</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
     <link href="./resources/medio.css" rel="stylesheet" type="text/css">
     <link href="./resources/audplayer.css" rel="stylesheet" type="text/css">
-    <script src="./resources/audplayer.js"></script>
   </head>
   <body>
     <p><?php echo $curDir;?>
@@ -49,12 +50,19 @@ foreach($dirs as $d) {
   echo '<p>(dir) <a href="?d='.urlencode($link).'">'.$d.'</a></p>';
 }
 //specify valid audio extentions
-$audext = array("mp3","opus","ogg"); //TODO: possibly also check webm, m4a, wav, wma, but only if they can be played in most browsers
+//TODO: possibly also check webm, m4a, wav, wma, but only if they can be played in most browsers
+$audext = array("mp3","opus","ogg");
+//valid playlistext
+$plext="m3u";
 foreach($files as $f) {
-  foreach ($audext as $e) {
-    if (substr($f, -1*strlen($e))===$e)
+foreach ($audext as $e) {
+    $ext = substr($f, -1*strlen($e));
+    if($ext===$e)
       $hasaud=TRUE;
   }
+  if(substr($f, -1*strlen($plext))===$plext)
+    $haspl=TRUE;
+
   $link = $curDir."/".$f; //make the link to the file/dir
   echo '<p><a href="'.$link.'">'.$f.'</a></p>';
 }
@@ -70,11 +78,18 @@ foreach($files as $f) {
     echo "</div>";
 
     if($hasaud) {
-      include "./resources/audplayer.php";
+      include "./resources/audplayer-folder.php";
+    } else {
+      echo "<div></div>";
+    }
+
+    if($haspl) {
+      include "./resources/audplayer-pl.php";
     } else {
       echo "<div></div>";
     }
 ?>
     </div>
+    <script src="./resources/audplayer.js" defer></script>
   </body>
 </html>
