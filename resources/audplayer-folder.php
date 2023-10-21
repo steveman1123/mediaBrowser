@@ -2,7 +2,14 @@
 //location of the audio files to play
 
 // get songs from the specified dir
-$songs = glob($curDir."/*.{mp3,webm,ogg,wav,opus}", GLOB_BRACE); /**/
+$songs = glob($curDir."/*.{mp3,webm,ogg,wav,opus,m4a}", GLOB_BRACE); /**/
+//TODO: adjust getting songs as a 2 part deal:
+//get all files
+//$files = glob($curDir."/*");
+//isolate only the song files
+//$songs = preg_grep('{some_regex}',$files);
+
+
 if(is_file($curDir."/folder.jpg")) {
   $folderpic = $curDir."/folder.jpg";
 } else {
@@ -14,7 +21,13 @@ if(is_file($curDir."/folder.jpg")) {
   //this is a hack to pass php var to js indirectly. There's probably a better way, but this works
   echo $curDir; ?></span>
   <img class="folderpic" src="<?php echo $folderpic;?>">
+  <h4 class="nowplaying">-</h4>
   <audio class="playerAudio" controls></audio>
+  <div class="plcontrol">
+    <input type="checkbox" name="shuffle" class="shuff">shuffle
+    <span>  |  </span>
+    <input type="checkbox" name="loop" checked class="loop">loop
+  </div>
   <div class="playerList">
     <?php
     
@@ -31,8 +44,7 @@ if(is_file($curDir."/folder.jpg")) {
         //parse the output further
         $tags = array(); //fianl tags output
         foreach ($o as $i=>$t) {
-          $tag = preg_split("/: /", $t);
-          //TODO: if no tag is found, put the filename instead
+          $tag = explode(": ",$t,2);
           if(sizeof($tag)==2) {
             $tag[0] = substr($tag[0],0,4);
             $tags[$tag[0]] = $tag[1];
@@ -45,7 +57,7 @@ if(is_file($curDir."/folder.jpg")) {
 
         //TODO: add a button on the right side that can add the song to a playlist
         if(array_key_exists("TIT2",$tags) && strlen($tags['TIT2'])>0) {
-          echo "<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='trck'>".$tags['TRCK']."</span> - <span class='title'>".$tags['TIT2']."</span></div>";
+          echo "<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='title'>".$tags['TRCK']." - ".$tags['TIT2']."</span></div>";
         } else {
           echo"<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='title'>".$name."</span></div>";
         }

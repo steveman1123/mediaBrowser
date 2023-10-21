@@ -1,5 +1,5 @@
 <?php
-$exclude = ["./resources","./index.php","./LICENSE","./README"]; //exclude these files/directories from being displayed - path must be relative to this file
+$exclude = ["./resources","./index.php","./LICENSE","./README.md"]; //exclude these files/directories from being displayed - path must be relative to this file
 
 //if the directory var is set,
 if(isset($_GET['d'])) {
@@ -24,20 +24,20 @@ $oneUp = implode("/",array_splice(explode("/",$curDir),0,-1)); //convert path va
     <link href="./resources/audplayer.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <p><?php echo $curDir;?>
     <div id="dirplaywrap">
       <div id="dirlist">
-    <p><a href="/">Back to Home</a></p>
-    <?php if(strcmp($curDir,".")) { ?>
-    <p><a href=".">Go to Top</a></p>
-    <p><a href="?d=<?php echo urlencode($oneUp); ?>">Go Up One Folder</a></p>
-    <?php } else { ?><p>&nbsp;</p><p>&nbsp;</p><?php }?>
-    <div class="break"></div>
+        <p id="auddir"><?php echo $curDir;?></p>
+        <p><a href="/">Back to Home</a></p>
+<?php if(strcmp($curDir,".")) { ?>
+        <p><a href=".">Go to Top</a></p>
+        <p><a href="?d=<?php echo urlencode($oneUp); ?>">Go Up One Folder</a></p>
+<?php } else { ?><p>&nbsp;</p><p>&nbsp;</p><?php }?>
+        <div class="break"></div>
 <?php
 //$files = preg_grep('/^([^.])/', scandir($curDir)); //remove hidden files/dirs
 $hasaud = FALSE;
 //isolate the directory to scan
-$scanDir = rtrim($curDir,'/').'/*';
+$scanDir = rtrim($curDir,'/').'/*'; /**/
 //get the directories
 $dirs = glob($scanDir,GLOB_ONLYDIR);
 //remove the dirs and exclude files, then trim the "/"
@@ -50,41 +50,32 @@ foreach($dirs as $d) {
   echo '<p>(dir) <a href="?d='.urlencode($link).'">'.$d.'</a></p>';
 }
 //specify valid audio extentions
-//TODO: possibly also check webm, m4a, wav, wma, but only if they can be played in most browsers
-$audext = array("mp3","opus","ogg");
-//valid playlistext
-$plext="m3u";
-foreach($files as $f) {
-foreach ($audext as $e) {
-    $ext = substr($f, -1*strlen($e));
-    if($ext===$e)
-      $hasaud=TRUE;
-  }
-  if(substr($f, -1*strlen($plext))===$plext)
-    $haspl=TRUE;
+//TODO: possibly also check webm, wav, wma, but only if they can be played in most browsers
+$audext = array("mp3","opus","ogg","m4a");
 
-  $link = $curDir."/".$f; //make the link to the file/dir
-  echo '<p><a href="'.$link.'">'.$f.'</a></p>';
+$hasaud = FALSE;
+foreach($files as $f) {
+  $ext = strtolower(pathinfo($f,PATHINFO_EXTENSION));
+
+  $hasaud = in_array($ext,$audext) || $hasaud;
+
+  //don't make the playlists links, instead make them load/toggle the playlist
+  if($ext !== "m3u") {
+    $link = $curDir."/".$f; //make the link to the file/dir
+    echo '<p><a href="'.$link.'">'.$f.'</a></p>';
+  } else {
+    echo '<p><a href="javascript:;" onclick="loadpl(this);">'.$f.'</a></p>';
+  }
 }
 ?>
-    
-    
-    <div id="metadata">
-      <p><?php echo sizeof($files);?> files</p>
-      <p><?php echo sizeof($dirs);?> directories</p>
-    </div>
-
+        <div id="metadata">
+          <p><?php echo sizeof($files);?> files</p>
+          <p><?php echo sizeof($dirs);?> directories</p>
+        </div>
+      </div>
 <?php
-    echo "</div>";
-
     if($hasaud) {
       include "./resources/audplayer-folder.php";
-    } else {
-      echo "<div></div>";
-    }
-
-    if($haspl) {
-      include "./resources/audplayer-pl.php";
     } else {
       echo "<div></div>";
     }

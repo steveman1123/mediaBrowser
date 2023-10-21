@@ -2,6 +2,7 @@
 .player {
   width: 450px;
   text-align: center;
+  display: block;
 }
 
 .player .folderpic {
