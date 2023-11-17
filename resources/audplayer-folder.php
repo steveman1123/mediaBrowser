@@ -24,9 +24,14 @@ if(is_file($curDir."/folder.jpg")) {
   <h4 class="nowplaying">-</h4>
   <audio class="playerAudio" controls></audio>
   <div class="plcontrol">
-    <input type="checkbox" name="shuffle" class="shuff">shuffle
+    <p>
+      <button class="goback">prev</button>
+      <button class="playpause">play/pause</button>
+      <button class="goforward">next</button>
+    </p>
+    <label><input type="checkbox" name="shuffle" class="shuff">shuffle</label>
     <span>  |  </span>
-    <input type="checkbox" name="loop" checked class="loop">loop
+    <label><input type="checkbox" name="loop" checked class="loop">loop</label>
   </div>
   <div class="playerList">
     <?php

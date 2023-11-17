@@ -1,5 +1,6 @@
 <?php
 $exclude = ["./resources","./index.php","./LICENSE","./README.md"]; //exclude these files/directories from being displayed - path must be relative to this file
+$globalexclude = ["lost+found"]; //exclude any instance of these
 
 //if the directory var is set,
 if(isset($_GET['d'])) {
@@ -42,8 +43,12 @@ $scanDir = rtrim($curDir,'/').'/*'; /**/
 $dirs = glob($scanDir,GLOB_ONLYDIR);
 //remove the dirs and exclude files, then trim the "/"
 $files = str_replace($curDir.'/','',array_diff(array_diff(glob($scanDir),$dirs),$exclude));
+$files = array_diff($files,$globalexclude);
 //remove the specified exclude dirs, then trim the "/"
 $dirs = str_replace($curDir.'/','',array_diff($dirs,$exclude));
+//remove the global excludes from the disr
+$dirs = array_diff($dirs,$globalexclude);
+
 
 foreach($dirs as $d) {
   $link = $curDir."/".$d; //make the link to the file/dir

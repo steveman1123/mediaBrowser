@@ -7,6 +7,7 @@ function initplaylists() {
   //get all the players
   var players = document.getElementsByClassName("player");
   var audios = [];
+  const savedsongs = 25; //determine how many previous songs to save
 
   //console.log(players);
   //for each player, set up its environment
@@ -14,19 +15,28 @@ function initplaylists() {
     //the player environment
     let aud = {
       //everything is relative to the player wrapper
-      player: players[p],
-      audio: null,
-      playlist: null,
-      now: 0,
-      shuffle: true,
-      loop: true,
+      player: players[p], //this player
+      goback: null, //button to go back a song
+      playpause: null, //button to play/pause
+      goforward: null, //button go to next song
+      prevsongs: Array(savedsongs), //previously played songs
+      audio: null, //html audio element
+      playlist: null, //div containing list of songs
+      id: 0,
+      now: 0, //currently playing song
+      shuffle: true, //toggle shuffing
+      loop: true, //toggle playlist looping
 
       init : () => {
-        //get the audio features (player, playlist, and directory
+        //get the audio features (player, controls, playlist, and directory)
         aud.audio = aud.player.querySelectorAll(".playerAudio")[0];
+
+        aud.goback = aud.player.querySelectorAll(".goback")[0];
+        aud.playpause = aud.player.querySelectorAll(".playpause")[0];
+        aud.goforward = aud.player.querySelectorAll(".goforward")[0];
+
         aud.playlist = aud.player.querySelectorAll(".playerList .song");
-        auddir = document.getElementById("auddir").innerHTML+"/"; //aud.player.querySelectorAll(".auddir")[0].innerHTML.replace("&amp;","&")+"/";
-        
+        auddir = decodeURI(document.getElementById("auddir").innerText+"/");
         //assign event handlers to the playlist elements
         for(let i=0;i<aud.playlist.length;i++) {
           aud.playlist[i].onclick = () => { aud.play(i); };
@@ -35,29 +45,58 @@ function initplaylists() {
         //autoplay
         aud.audio.oncanplay = aud.audio.play;
 
-        //at the end of each song, check if shuffle and loop are enabled
-        aud.audio.onended = () => {
-          aud.shuffle = aud.player.querySelectorAll(".shuff")[0].checked;
-          aud.loop = aud.player.querySelectorAll(".loop")[0].checked;
+        aud.audio.onended = aud.playnext;
 
-          if(aud.shuffle) {
-            aud.now = Math.floor(Math.random() * aud.playlist.length);
-          } else {
-            aud.now++;
+        aud.goback.onclick = aud.playprev;
+        aud.playpause.onclick = aud.playerpause;
+        aud.goforward.onclick = aud.playnext;
+
+        navigator.mediaSession.setActionHandler("previoustrack", aud.playprev);
+        navigator.mediaSession.setActionHandler("nexttrack", aud.playnext);
+      },
+
+      playprev : () => {
+        aud.play(aud.prevsongs.shift());
+      },
+
+      //whenever looking to play next song, check if shuffle and loop are enabled
+      playnext : () => {
+        aud.shuffle = aud.player.querySelectorAll(".shuff")[0].checked;
+        aud.loop = aud.player.querySelectorAll(".loop")[0].checked;
+
+        if(aud.shuffle) {
+          aud.id = Math.floor(Math.random() * aud.playlist.length);
+        } else {
+          aud.id++;
+        }
+
+        if(aud.loop) {
+          if(aud.id>=aud.playlist.length) {
+            aud.id = 0;
           }
-          
-          if(aud.loop) {
-            if(aud.now>=aud.playlist.length) {
-              aud.now = 0;
-            }
-          }
-          //play the song
-          aud.play(aud.now);
-        };
+        }
+
+        if(Number.isInteger(aud.now)) {
+          aud.prevsongs.unshift(aud.now);
+          aud.prevsongs.length = savedsongs;
+        }
+        //play the song
+        aud.play(aud.id);
+      },
+
+      playerpause : () => {
+        if(isPlaying) {
+          aud.audio.pause();
+          isPlaying = false;
+        } else {
+          aud.audio.play();
+          isPlaying = true;
+        }
       },
 
       //play the song
       play : id => {
+        //console.log(aud.prevsongs);
         //get the one now playing
         aud.now = id;
         //get and display the now playing in the playlist and the title
@@ -65,14 +104,16 @@ function initplaylists() {
         aud.player.getElementsByClassName("nowplaying")[0].innerHTML = title;
         document.title = title+" | "+document.ogtitle;
         //set the audio source as the one now playing
-        aud.audio.src = auddir+aud.playlist[id].dataset.src; //auddir + aud.playlist[id].dataset.src;
+        aud.audio.src = auddir+aud.playlist[id].dataset.src;
         //assign the playlist element now-playing classes
         for(let i=0; i<aud.playlist.length;i++) {
           if(i==id) { aud.playlist[i].classList.add("now"); }
           else { aud.playlist[i].classList.remove("now"); }
         }
+        isPlaying = true;
       }
     };
+    
     //add the new player to the list of them
     audios.push(aud);
   }
