@@ -1,4 +1,3 @@
-
 .player {
   width: 450px;
   text-align: center;
@@ -12,16 +11,42 @@
   border-radius: 10px;
 }
 
-.player .plcontrol {
+.plcontrol {
   border: solid black 1px;
 }
 
-.shuff {
-  font-size: large;
+.plcontrol > p { margin: 10px; }
+
+.plcontrol * {
+  font-size: 20pt;
+  background-color: #fff;
+  border: none;
+  border-radius: 8px;
 }
+
+.plcontrol button:hover { transform: scale(1.5); }
+.plcontrol button:focus { transform: scale(1.5); }
+
+.plcontrol input:hover ~ span { transform: scale(1.5); }
+.plcontrol input:focus ~ span { transform: scale(1.5); }
+
+
+.plcontrol input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+}
+
+.plcontrol label, .plcontrol span {
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.plcontrol input:checked ~ span { color: red; }
 
 .playerAudio { width: 100%; }
 .playerList { 
+  border: solid black 1px;
   margin-top: 10px;
   text-align: left;
   max-height: 50vh;

@@ -19,13 +19,15 @@ if(array_key_exists("plfile",$data)) {
   <audio class="playerAudio" controls></audio>
   <div class="plcontrol">
     <p>
-      <button class="goback">prev</button>
-      <button class="playpause">play/pause</button>
-      <button class="goforward">next</button>
+      <button class="goback">&#x23EE;</button>
+      <button class="playpause">&#x23EF;</button>
+      <button class="goforward">&#x23ED;</button>
     </p>
-    <label><input type="checkbox" name="shuffle" checked class="shuff">shuffle</label>
-    <span>  |  </span>
-    <label><input type="checkbox" name="loop" checked class="loop">loop</label>
+    <p>
+      <span title="shuffle"><label><input type="checkbox" name="shuffle" checked class="shuff"><span>&#10536;</span></label></span>
+      <span>  |  </span>
+      <span title="loop"><label><input type="checkbox" name="loop" checked class="loop"><span>&#8635;</span></label></span>
+    </p>
   </div>
   <div class="playerList">
 
