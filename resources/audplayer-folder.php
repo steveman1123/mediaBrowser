@@ -10,8 +10,12 @@ $songs = glob($curDir."/*.{mp3,webm,ogg,wav,opus,m4a}", GLOB_BRACE); /**/
 //$songs = preg_grep('{some_regex}',$files);
 
 
+//$curDir = str_replace("#","%23",$curDir);
+//var_dump($curDir);
+
 if(is_file($curDir."/folder.jpg")) {
-  $folderpic = $curDir."/folder.jpg";
+  //TODO: check for other illegal/unhandled charachters?
+  $folderpic = str_replace("#","%23",$curDir)."/folder.jpg";
 } else {
   $folderpic = "./resources/placeholder.jpg";
 }
@@ -19,7 +23,7 @@ if(is_file($curDir."/folder.jpg")) {
 <div class="player">
   <span class="auddir" style="display: none;"><?php
   //this is a hack to pass php var to js indirectly. There's probably a better way, but this works
-  echo $curDir; ?></span>
+  echo urlencode($curDir); ?></span>
   <img class="folderpic" src="<?php echo $folderpic;?>">
   <h4 class="nowplaying">-</h4>
   <audio class="playerAudio" controls></audio>
