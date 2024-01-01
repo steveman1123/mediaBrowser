@@ -2,7 +2,9 @@
 //location of the audio files to play
 
 // get songs from the specified dir
+$curDir = str_replace(array("[","]"),array("\[","\]"),$curDir);
 $songs = glob($curDir."/*.{mp3,webm,ogg,wav,opus,m4a}", GLOB_BRACE); /**/
+
 //TODO: adjust getting songs as a 2 part deal:
 //get all files
 //$files = glob($curDir."/*");
