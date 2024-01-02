@@ -40,12 +40,12 @@ $hasaud = FALSE;
 //isolate the directory to scan
 $scanDir = rtrim($curDir,'/').'/*'; /**/
 //escape square brackets (TODO: probably should escape all regex?) so glob can understand it
-$scanDir = str_replace(array('[',']'),array('\[','\]'),$scanDir);
+$scanDirEscaped = str_replace(array('[',']'),array('\[','\]'),$scanDir);
 //get the directories
-$dirs = glob($scanDir,GLOB_ONLYDIR);
+$dirs = glob($scanDirEscaped,GLOB_ONLYDIR);
 
 //remove the dirs and excluded files, then trim the "/"
-$files = str_replace($curDir.'/','',array_diff(array_diff(glob($scanDir),$dirs),$exclude));
+$files = str_replace($curDir.'/','',array_diff(array_diff(glob($scanDirEscaped),$dirs),$exclude));
 $files = array_diff($files,$globalexclude);
 //remove the specified exclude dirs, then trim the "/"
 $dirs = str_replace($curDir.'/','',array_diff($dirs,$exclude));
