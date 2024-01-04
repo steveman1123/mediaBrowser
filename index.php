@@ -9,8 +9,10 @@ if(isset($_GET['d'])) {
 } else {
   $curDir = "."; //else, set it to the top level directory
 }
-$curDir = str_replace(["../",".."],"",$curDir)|"."; //remove higher directory listing - for security
-//echo $curDir; //SHOW ME WHAT YOU GOT
+
+//remove higher directory listing, so it's sandboxed to this directory and below
+if($curDir == "..") $curDir=".";
+$curDir = str_replace(["../"],"",$curDir)|".";
 
 $oneUp = implode("/",array_splice(explode("/",$curDir),0,-1)); //convert path var to array, remove last element, convert back to path
 ?>
