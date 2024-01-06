@@ -35,6 +35,7 @@ function initplaylists() {
         aud.playpause = aud.player.querySelectorAll(".playpause")[0];
         aud.goforward = aud.player.querySelectorAll(".goforward")[0];
         aud.shuffletog = aud.player.querySelectorAll(".shuff")[0];
+        aud.loop = aud.player.querySelectorAll(".loop")[0];
 
         aud.origpl = aud.player.querySelectorAll(".playerList .song");
         aud.playingpl = [...Array(aud.origpl.length).keys()];
@@ -42,11 +43,11 @@ function initplaylists() {
         
         auddir = decodeURI(document.getElementById("auddir").innerText+"/");
         auddir = auddir.replace("#","%23"); //TODO: check for other potentially illegal/unhandled characters?
-        alert(auddir);
+        //alert(auddir);
         //assign event handlers to the playlist elements
         for(let i=0;i<aud.origpl.length;i++) {
-          aud.origpl[i].onclick = () => { aud.play(i); };
-          aud.origpl[i].onkeypress = (e) => { if(e.keyCode == 13) {aud.play(i);} };
+          aud.origpl[i].onclick = () => { aud.click2play(i); };
+          aud.origpl[i].onkeypress = (e) => { if(e.keyCode == 13) {aud.click2play(i);} };
         }
         
         aud.audio.oncanplay = aud.audio.play;
@@ -65,7 +66,7 @@ function initplaylists() {
 
 
       playprev : () => {
-        aud.id--;
+        aud.id = Math.max(0,aud.id-1);
         if(aud.id<0) {
           aud.id = aud.playingpl.length-1;
         }
@@ -73,11 +74,25 @@ function initplaylists() {
       },
 
       playnext : () => {
-        aud.id++;
+        aud.id = Math.min(aud.playingpl.length,aud.id+1);
         if(aud.id>=aud.playingpl.length) {
-          aud.id = 0;
+          if(aud.loop.checked) {
+            //done with pl and looping
+            //reset and play
+            //console.log("done with pl and looping")
+            aud.id = 0;
+            aud.play(aud.playingpl[aud.id]);
+          } else {
+            //done with pl and no looping
+            //don't play
+            //console.log("done with pl and not playing")
+          }
+        } else {
+          //console.log("not done with pl, playing")
+          //not done with playlist
+          //play
+          aud.play(aud.playingpl[aud.id]);
         }
-        aud.play(aud.playingpl[aud.id]);
       },
 
       playerpause : () => {
@@ -101,24 +116,32 @@ function initplaylists() {
             let j = Math.floor(Math.random() * (i + 1));
             [aud.playingpl[i], aud.playingpl[j]] = [aud.playingpl[j], aud.playingpl[i]];
           }
+          aud.id = 0;
         } else {
           aud.playingpl = [...Array(aud.origpl.length).keys()];
+          aud.id = aud.now;
           //TODO: when toggling back and forth, pick up where it left off (so if it's playing idx 50 while shuffling (which could be play idx 4), then play 51 instead of 5
         }
-        //console.log(aud.playingpl);
+        //console.log(aud.id);
       },
 
+      //handle when clicking on a song, it sohuld populate the aud.id and then play
+      click2play : id => {
+        aud.shuffle();
+        aud.play(id);
+      },
 
+      
       //play the song
       play : id => {
-      
-        if(!Number.isInteger(id)) {
-          aud.id = 0;
-          id = aud.playingpl[aud.id];
-        }
-        
-        //console.log(id);
-        //console.log(aud.prevsongs);
+        //id = index of origpl to play
+        //aud.id = index of playingpl
+        //aud.playingpl = shuffled or non-shuffled playlist
+        //aud.origpl = non shuffled playlist
+
+        //console.log("id: "+id);
+        //console.log("aud.id: "+aud.id);
+
         //get the one now playing
         aud.now = id;
         //get and display the now playing in the playlist and the title
