@@ -47,9 +47,6 @@ a:hover {
     flex-flow: column nowrap;
     justify-content: space-between;
   }
-
-  #dirplaywrap > div {
-    width: 95%;
-  }
+  #dirplaywrap > div { width: 95%; }
   }
 }

@@ -25,6 +25,7 @@ $oneUp = implode("/",array_splice(explode("/",$curDir),0,-1)); //convert path va
     <meta charset="utf-8">
     <link href="./resources/medio.css" rel="stylesheet" type="text/css">
     <link href="./resources/audplayer.css" rel="stylesheet" type="text/css">
+    <link href="./resources/darkmode.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <div id="dirplaywrap">
