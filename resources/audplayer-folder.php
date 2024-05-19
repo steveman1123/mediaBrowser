@@ -47,7 +47,7 @@ if(is_file($curDir."/folder.jpg")) {
     if(is_array($songs)) {
       foreach ($songs as $k=>$s) {
         $name = basename($s);
-        //read class3v2 tags
+        //read id3v2 tags
         $cmd = 'id3v2 --list "'.$s.'"';
         //var_dump($cmd);
         $o = shell_exec($cmd." 2>&1");
@@ -63,14 +63,21 @@ if(is_file($curDir."/folder.jpg")) {
             $tags[$tag[0]] = $tag[1];
           }
         }
-        //TODO: add additional class3 tags like artist, track, album
-        //var_dump(array_key_exists("TIT2",$tags));
-        //var_dump(strlen($tags['TIT2']));
+        //TODO: add additional class3 tags like artist, genre, album, track length
         //var_dump($tags);
 
         //TODO: add a button on the right side that can add the song to a playlist
         if(array_key_exists("TIT2",$tags) && strlen($tags['TIT2'])>0) {
-          echo "<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='title'>".$tags['TRCK']." - ".$tags['TIT2']."</span></div>";
+          $yr= "";
+          if(array_key_exists("TYER",$tags) && strlen($tags['TYER'])>0) {
+            $yr = $tags['TYER'];
+          }
+          ?>
+          <div data-src="<?php echo rawurlencode($name); ?>" class="song" tabindex="0">
+            <span class="title"><?php echo $tags['TRCK']." - ".$tags['TIT2']; ?></span>
+            <span class="info"><?php if(strlen($yr)>0) { echo $yr; } ?></span>
+          </div>
+<?php
         } else {
           echo"<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='title'>".$name."</span></div>";
         }

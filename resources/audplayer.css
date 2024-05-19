@@ -57,6 +57,7 @@
   color: #333;
   border-bottom: 1px solid #e1e1e1;
   cursor: pointer;
+  height: 1em;
 }
 .playerList .song:first-child {
   border-top: 1px solid #e1e1e1;
@@ -69,9 +70,10 @@
 .playerList .song::before {
   content: "";
   margin-right: 10px;
+  float: left;
 }
 .playerList .song.now::before {
-  content: "\27A4";
+  content: "\25B6";
 }
 
 .playerList .song:hover, .playerList .song:focus {
@@ -79,3 +81,5 @@
   font-weight: bold;
 }
 
+.playerList .song .title { float: left; }
+.playerList .song .info { float: right; }

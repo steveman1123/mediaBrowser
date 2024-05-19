@@ -1,3 +1,4 @@
+//TODO: handle more special chars like $
 //run init fxn on load
 document.onload = initplaylists();
 document.ogtitle = document.title;
@@ -36,7 +37,6 @@ function initplaylists() {
         aud.goforward = aud.player.querySelectorAll(".goforward")[0];
         aud.shuffletog = aud.player.querySelectorAll(".shuff")[0];
         aud.loop = aud.player.querySelectorAll(".loop")[0];
-
         aud.origpl = aud.player.querySelectorAll(".playerList .song");
         aud.playingpl = [...Array(aud.origpl.length).keys()];
 
@@ -120,15 +120,16 @@ function initplaylists() {
         } else {
           aud.playingpl = [...Array(aud.origpl.length).keys()];
           aud.id = aud.now;
-          //TODO: when toggling back and forth, pick up where it left off (so if it's playing idx 50 while shuffling (which could be play idx 4), then play 51 instead of 5
         }
+        //console.log(aud.playingpl);
+        //console.log(aud.now);
         //console.log(aud.id);
       },
 
-      //handle when clicking on a song, it sohuld populate the aud.id and then play
+      //handle when clicking on a song, it should populate the aud.id and play
       click2play : id => {
-        aud.shuffle();
         aud.play(id);
+        aud.shuffle();
       },
 
       
@@ -145,8 +146,8 @@ function initplaylists() {
         //get the one now playing
         aud.now = id;
         //get and display the now playing in the playlist and the title
-        title = decodeURI(aud.origpl[id].firstChild.firstChild.nodeValue);
-        aud.player.getElementsByClassName("nowplaying")[0].innerHTML = title;
+        title = decodeURI(aud.origpl[id].firstElementChild.innerText);
+        aud.player.getElementsByClassName("nowplaying")[0].innerText = title;
         document.title = title+" | "+document.ogtitle;
         //set the audio source as the one now playing
         aud.audio.src = auddir+aud.origpl[id].dataset.src;
@@ -193,13 +194,14 @@ function loadpl(e) {
 
     //get the playlist innerhtml from the api
     var url = "./resources/audplayer-pl.php";
+    var curdir = document.getElementById("auddir").innerText;
     fetch(url, {
       method: "POST",
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({'plfile':plfile})
+      body: JSON.stringify({'plfile':plfile,'curdir':curdir})
     })
     .then((response) => response.text())
     .then((text) => {
