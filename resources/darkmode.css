@@ -1,0 +1,30 @@
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: white;
+  }
+  a { color: #4cf; }
+
+  #metadata { color: #aaa; }
+
+  .break { border: solid white 1px; }
+
+
+
+  .plcontrol {
+    border: solid white 1px;
+    color: black;
+  }
+  .playerList {
+    border: solid white 1px;
+  }
+  .playerList * {
+    color: white;
+  }
+
+  .playerList .song.now * {
+    color: #000;
+    background: #feffd9;
+  }
+
+}

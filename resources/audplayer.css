@@ -7,6 +7,8 @@
 .player .folderpic {
   max-width: 50%;
   max-height: 30vh;
+  min-width: 200px;
+  height: auto;
   border: solid black 1px;
   border-radius: 10px;
 }
@@ -57,7 +59,8 @@
   color: #333;
   border-bottom: 1px solid #e1e1e1;
   cursor: pointer;
-  height: 1em;
+  overflow: auto;
+  min-height: 1em;
 }
 .playerList .song:first-child {
   border-top: 1px solid #e1e1e1;
@@ -81,5 +84,5 @@
   font-weight: bold;
 }
 
-.playerList .song .title { float: left; }
+.playerList .song .title { float: left; max-width: 85%; }
 .playerList .song .info { float: right; }

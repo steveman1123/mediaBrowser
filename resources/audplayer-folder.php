@@ -13,13 +13,13 @@ $songs = glob($curDirEscaped."/*.{mp3,webm,ogg,wav,opus,m4a}", GLOB_BRACE); /**/
 
 
 //$curDir = str_replace("#","%23",$curDir);
-//var_dump($curDir);
+//var_dump($curDir); /* */
 
 if(is_file($curDir."/folder.jpg")) {
   //TODO: check for other illegal/unhandled charachters?
   $folderpic = str_replace("#","%23",$curDir)."/folder.jpg";
 } else {
-  $folderpic = "./resources/placeholder.jpg";
+  $folderpic = "./resources/placeholder.svg";
 }
 ?>
 <div class="player">
@@ -48,12 +48,22 @@ if(is_file($curDir."/folder.jpg")) {
       foreach ($songs as $k=>$s) {
         $name = basename($s);
         //read id3v2 tags
-        $cmd = 'id3v2 --list "'.$s.'"';
-        //var_dump($cmd);
+        //TODO: get all the metadatas first, then parse them! That should make it faster
+        //$cmd = "find . -iname '*.mp3' -exec ffprobe -v quiet -print_format json -show_format {} \;";
+        
+        //id3 tag processing using ffprobe
+        $cmd = 'ffprobe -v quiet -print_format json -show_format "'.$s.'"';
         $o = shell_exec($cmd." 2>&1");
+        $o = json_decode($o,TRUE);
+        //var_dump($o);
+        $tags = $o['format']['tags'];
+
+        /*
+        //old id3 tag processing using id3v2
+        $cmd = 'id3v2 --list "'.$s.'"';
         //split by newline, trim off first few lines
         $o = array_slice(preg_split("/\r\n|\n|\r/", $o),1);
-        //var_dump($o);
+
         //parse the output further
         $tags = array(); //fianl tags output
         foreach ($o as $i=>$t) {
@@ -63,26 +73,44 @@ if(is_file($curDir."/folder.jpg")) {
             $tags[$tag[0]] = $tag[1];
           }
         }
-        //TODO: add additional class3 tags like artist, genre, album, track length
-        //var_dump($tags);
-
+        */
+        
         //TODO: add a button on the right side that can add the song to a playlist
-        if(array_key_exists("TIT2",$tags) && strlen($tags['TIT2'])>0) {
-          $yr= "";
-          if(array_key_exists("TYER",$tags) && strlen($tags['TYER'])>0) {
-            $yr = $tags['TYER'];
-          }
-          ?>
-          <div data-src="<?php echo rawurlencode($name); ?>" class="song" tabindex="0">
-            <span class="title"><?php echo $tags['TRCK']." - ".$tags['TIT2']; ?></span>
-            <span class="info"><?php if(strlen($yr)>0) { echo $yr; } ?></span>
-          </div>
-<?php
-        } else {
-          echo"<div data-src='".rawurlencode($name)."' class='song' tabindex='0'><span class='title'>".$name."</span></div>";
+
+        echo "<div data-src='".rawurlencode($name)."' class='song' tabindex='0'>";
+        //default value of the filename
+        $songhtml = "<span class='title'>".$name."</span>";
+
+        //add the track and title
+        if(array_key_exists("title",$tags) && strlen($tags['title'])>0) {
+          $songhtml = "<span class='title'>".$tags['track']." - ".$tags['title']."</span>";
         }
+
+        //add the genre
+        $songhtml .= "<span class='info'>";
+        if(array_key_exists("genre",$tags) && strlen($tags['genre'])>0) {
+          $songhtml .= $tags['genre'];
+        }
+        
+        //add the release date
+        if(array_key_exists("date",$tags) && strlen($tags['date'])>0) {
+          $songhtml .= " | ".$tags['date'];
+        }
+        
+        //add the duration
+        $mm = intval(floatval($o['format']['duration'])/60);
+        $ss = intval(floatval($o['format']['duration'])-60*$mm);
+        $songhtml .= " | ".$mm.":".str_pad($ss,2,"0",STR_PAD_LEFT);
+        
+        $songhtml .= "</span>";
+
+        echo $songhtml;
+        
+        echo "</div>";
+
+
       }
-    } else { 
+    } else {
       echo "No songs found!";
     }
   ?>

@@ -1,9 +1,13 @@
 <?php
 
-//where the playlists are stored
-$pldir = "../";
 
 $data = json_decode(file_get_contents("php://input"),true);
+$curdir = $data['curdir'];
+
+//where the playlists are stored
+$pldir = "../".$curdir."/";
+
+
 
 if(array_key_exists("plfile",$data)) {
   if(file_exists($pldir.$data['plfile'])) {
