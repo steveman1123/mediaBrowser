@@ -22,6 +22,10 @@
     color: white;
   }
 
+  .playerList .song:hover *, .playerList .song:focus * {
+    color: red;
+  }
+
   .playerList .song.now * {
     color: #000;
     background: #feffd9;

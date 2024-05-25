@@ -31,13 +31,10 @@ if(is_file($curDir."/folder.jpg")) {
   <audio class="playerAudio" controls></audio>
   <div class="plcontrol">
     <p>
+      <span title="shuffle"><label><input type="checkbox" name="shuffle" class="shuff"><span>&#10536;</span></label></span>
       <button class="goback">&#x23EE;</button>
       <button class="playpause">&#x23EF;</button>
       <button class="goforward">&#x23ED;</button>
-    </p>
-    <p>
-      <span title="shuffle"><label><input type="checkbox" name="shuffle" class="shuff"><span>&#10536;</span></label></span>
-      <span>  |  </span>
       <span title="loop"><label><input type="checkbox" name="loop" checked class="loop"><span>&#8635;</span></label></span>
     </p>
   </div>
@@ -49,7 +46,9 @@ if(is_file($curDir."/folder.jpg")) {
         $name = basename($s);
         //read id3v2 tags
         //TODO: get all the metadatas first, then parse them! That should make it faster
-        //$cmd = "find . -iname '*.mp3' -exec ffprobe -v quiet -print_format json -show_format {} \;";
+        //possibly this cmd (until we can figure out a faster way with caching or something)
+        //echo "[" && find . -iname "*.mp3" -exec ffprobe -print_format json -show_format -v quiet {} \; -exec echo "," \; && echo "]"
+        //which should return a json text
         
         //id3 tag processing using ffprobe
         $cmd = 'ffprobe -v quiet -print_format json -show_format "'.$s.'"';
@@ -92,12 +91,12 @@ if(is_file($curDir."/folder.jpg")) {
         //add the genre
         $songhtml .= "<span class='info'>";
         if(array_key_exists("genre",$tags) && strlen($tags['genre'])>0) {
-          $songhtml .= $tags['genre']." | ";
+          $songhtml .= $tags['genre']."&nbsp;|&nbsp;";
         }
         
-        //add the release date
+        //add the release dat
         if(array_key_exists("date",$tags) && strlen($tags['date'])>0) {
-          $songhtml .= $tags['date']." | ";
+          $songhtml .= $tags['date']."&nbsp;|&nbsp;";
         }
         
         //add the duration

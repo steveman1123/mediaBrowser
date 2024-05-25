@@ -23,13 +23,10 @@ if(array_key_exists("plfile",$data)) {
   <audio class="playerAudio" controls></audio>
   <div class="plcontrol">
     <p>
+      <span title="shuffle"><label><input type="checkbox" name="shuffle" checked class="shuff"><span>&#10536;</span></label></span>
       <button class="goback">&#x23EE;</button>
       <button class="playpause">&#x23EF;</button>
       <button class="goforward">&#x23ED;</button>
-    </p>
-    <p>
-      <span title="shuffle"><label><input type="checkbox" name="shuffle" checked class="shuff"><span>&#10536;</span></label></span>
-      <span>  |  </span>
       <span title="loop"><label><input type="checkbox" name="loop" checked class="loop"><span>&#8635;</span></label></span>
     </p>
   </div>
@@ -37,53 +34,49 @@ if(array_key_exists("plfile",$data)) {
 
     <?php
     if(is_array($songs)) {
+
       foreach ($songs as $k=>$s) {
+        $s = trim($s);
         if(strlen($s)>1) {
           $name = basename($s);
           //read id3v2 tags
-          $cmd = 'id3v2 --list "'.trim($pldir.$s).'"';
-          //var_dump($cmd);
-          //$o = shell_exec($cmd);
+          //$cmd = 'id3v2 --list "'.trim($pldir.$s).'"';
+          $cmd = 'ffprobe -v quiet -print_format json -show_format "'.$pldir.$s.'"';
           $o = shell_exec($cmd." 2>&1");
-          
-          //split by newline, trim off first few lines
-          $o = array_slice(preg_split("/\r\n|\n|\r/", $o),1);
-          //var_dump($o);
+          $o = json_decode($o,TRUE);
 
-          //parse the output further
-          $tags = array(); //fianl tags output
-          foreach ($o as $i=>$t) {
-            $tag = explode(": ", $t,2);
-            if(sizeof($tag)==2) {
-              $tag[0] = substr($tag[0],0,4);
-              $tags[$tag[0]] = $tag[1];
-            }
+
+          $tags = Array();
+          if(array_key_exists("tags",$o['format'])) {
+            $tags = $o['format']['tags'];
           }
-          //ensure that the array key "TPE2" is populated (sometimes only TPE1 is)
+
           //var_dump($tags);
-          if(!array_key_exists("TPE2",$tags)) {
-            if(array_key_exists("TPE1",$tags)) {
-              $tags['TPE2'] = $tags['TPE1'];
-            }
-          }
-          
-          
-          //TODO: figure out hoe to display unicode chars
-          //var_dump($tags);
-          //TODO: add additional id3 tags like artist
-          //var_dump(array_key_exists("TIT2",$tags));
-          //var_dump(strlen($tags['TIT2']));
-          //TODO: add a button to remove a song from the playlist
+
+
+          //TODO: add a button to remove a song from the playlist & reorder
           $songurl = str_replace("%2F","/",rawurlencode(trim($s)));
-          if(array_key_exists("TIT2",$tags) && strlen($tags['TIT2'])>0) {
-            //TODO: display more info and break each type apart to clean up output
-            echo "<div data-src='".$songurl."' class='song' tabindex='0'><span class='title'>".$tags['TPE2']." - ".$tags['TIT2']."</span></div>";
-          } else {
-            echo"<div data-src='".$songurl."' class='song' tabindex='0'><span class='title'>".$name."</span></div>";
+          echo "<div data-src='".$songurl."' class='song' tabindex='0'>";
+          //default text
+          $songhtml = "<span class='title'>".$name."</span>";
+          if(array_key_exists("title",$tags) && array_key_exists("artist",$tags)) {
+            $songhtml = "<span class='title'>".$tags['artist']." - ".$tags['title']."</span>";
           }
+          $songhtml .= "<span class='info'>";
+
+          $mm = intval(floatval($o['format']['duration'])/60);
+          $ss = intval(floatval($o['format']['duration'])-60*$mm);
+          $songhtml .= $mm.":".str_pad($ss,2,"0",STR_PAD_LEFT);
+
+          $songhtml .= "</span>";
+
+          echo $songhtml;
+          echo "</div>";
+
         }
       }
-    } else { 
+
+    } else {
       echo "No songs found!";
     }
   ?>

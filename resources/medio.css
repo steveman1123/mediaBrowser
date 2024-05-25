@@ -19,7 +19,7 @@ a:hover {
 
 .break {
   border: solid black 1px;
-  width: 10%;
+  width: 10em;
 }
 
 #dirplaywrap {
@@ -42,7 +42,7 @@ a:hover {
   line-height: 0.1em;
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 1000px) {
   #dirplaywrap {
     flex-flow: column nowrap;
     justify-content: space-between;
