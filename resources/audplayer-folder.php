@@ -56,7 +56,10 @@ if(is_file($curDir."/folder.jpg")) {
         $o = shell_exec($cmd." 2>&1");
         $o = json_decode($o,TRUE);
         //var_dump($o);
-        $tags = $o['format']['tags'];
+        $tags = Array();
+        if(array_key_exists("tags",$o['format'])) {
+          $tags = $o['format']['tags'];
+        }
 
         /*
         //old id3 tag processing using id3v2
@@ -89,18 +92,18 @@ if(is_file($curDir."/folder.jpg")) {
         //add the genre
         $songhtml .= "<span class='info'>";
         if(array_key_exists("genre",$tags) && strlen($tags['genre'])>0) {
-          $songhtml .= $tags['genre'];
+          $songhtml .= $tags['genre']." | ";
         }
         
         //add the release date
         if(array_key_exists("date",$tags) && strlen($tags['date'])>0) {
-          $songhtml .= " | ".$tags['date'];
+          $songhtml .= $tags['date']." | ";
         }
         
         //add the duration
         $mm = intval(floatval($o['format']['duration'])/60);
         $ss = intval(floatval($o['format']['duration'])-60*$mm);
-        $songhtml .= " | ".$mm.":".str_pad($ss,2,"0",STR_PAD_LEFT);
+        $songhtml .= $mm.":".str_pad($ss,2,"0",STR_PAD_LEFT);
         
         $songhtml .= "</span>";
 

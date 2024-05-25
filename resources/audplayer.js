@@ -37,6 +37,7 @@ function initplaylists() {
         aud.goforward = aud.player.querySelectorAll(".goforward")[0];
         aud.shuffletog = aud.player.querySelectorAll(".shuff")[0];
         aud.loop = aud.player.querySelectorAll(".loop")[0];
+        aud.playlistdiv = aud.player.querySelectorAll(".playerList")[0];
         aud.origpl = aud.player.querySelectorAll(".playerList .song");
         aud.playingpl = [...Array(aud.origpl.length).keys()];
 
@@ -153,8 +154,13 @@ function initplaylists() {
         aud.audio.src = auddir+aud.origpl[id].dataset.src;
         //assign the playlist element now-playing classes
         for(let i=0; i<aud.origpl.length;i++) {
-          if(i==id) { aud.origpl[i].classList.add("now"); }
-          else { aud.origpl[i].classList.remove("now"); }
+          if(i==id) {
+            aud.origpl[i].classList.add("now");
+            //scroll pl div to show now playing in middle
+            aud.playlistdiv.scrollTop = aud.origpl[i].offsetTop - aud.playlistdiv.offsetTop - aud.playlistdiv.offsetHeight / 2 + aud.origpl[i].offsetHeight;
+          } else {
+            aud.origpl[i].classList.remove("now");
+          }
         }
         aud.isPlaying = true;
       }
